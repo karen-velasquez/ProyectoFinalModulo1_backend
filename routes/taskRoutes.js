@@ -10,7 +10,7 @@ const auth = (req, res, next) => {
 
 router.post('/tasks', auth, taskController.createTask);
 router.put('/tasks/:id', auth, taskController.updateTask);
-router.get('/tasks', taskController.getAllTasks);
+router.get('/tasks', auth, taskController.getAllTasks);  // La ruta está protegida por el middleware de autenticación
 router.delete('/tasks/:id', auth, taskController.deleteTask);
 
 

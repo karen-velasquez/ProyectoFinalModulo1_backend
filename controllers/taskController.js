@@ -1,4 +1,5 @@
 const { Task, AuditLog, User } = require('../models');
+const { Op } = require('sequelize');
 
 
 // Crear tarea
@@ -76,13 +77,35 @@ exports.updateTask = async (req, res) => {
 
 exports.getAllTasks = async (req, res) => {
   try {
+    const userId = req.user.id;  // Asegúrate de que req.user esté disponible por el middleware
+
+    // Obtener los filtros de la query
+    const { status, search } = req.query;
+
+    // Crear el objeto de filtros
+    const filters = {
+      createdBy: userId,  // Filtrar solo las tareas del usuario autenticado
+    };
+
+    // Si se especifica un filtro de estado (status), lo añadimos al objeto de filtros
+    if (status) {
+      filters.status = status;
+    }
+
+    // Si se especifica un filtro de búsqueda (search), lo añadimos al objeto de filtros
+    if (search) {
+      filters.description = { [Op.iLike]: `%${search}%` };  // Buscamos en la descripción (case insensitive)
+    }
+
+    // Buscar las tareas que coincidan con los filtros
     const tasks = await Task.findAll({
+      where: filters,
       include: {
         model: User,
         as: 'creator',
-        attributes: ['id', 'name', 'email']
+        attributes: ['id', 'name', 'email'],
       },
-      order: [['createdAt', 'DESC']] // Opcional: ordena de más reciente a más antigua
+      order: [['createdAt', 'DESC']],  // Opcional: ordena de más reciente a más antigua
     });
 
     res.json(tasks);
@@ -91,6 +114,7 @@ exports.getAllTasks = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener las tareas' });
   }
 };
+
 
 
 

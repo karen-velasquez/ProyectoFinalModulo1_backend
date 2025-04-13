@@ -7,7 +7,19 @@ var indexRouter = require('./routes/index');
 var authRoutes = require('./routes/authRoutes');
 var taskRoutes = require('./routes/taskRoutes'); // 
 
+
+const cors = require('cors');
+
 var app = express();
+
+// Habilitar CORS para todas las rutas y orígenes
+app.use(cors());
+
+// Si deseas permitir solo tu frontend:
+app.use(cors({
+  origin: 'http://localhost:3001', // reemplaza con tu URL frontend si está en producción
+  credentials: true
+}));
 
 app.use(logger('dev'));
 app.use(express.json());

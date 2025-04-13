@@ -2,17 +2,14 @@ const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
 
-// Middleware de autenticación simulado (reemplaza por uno real si lo tienes)
-const auth = (req, res, next) => {
-  req.user = { id: 1 }; // simula usuario logueado
-  next();
-};
+const authMiddleware = require('../middlewares/authMiddleware'); // 👈 nombre original
 
-router.post('/tasks', auth, taskController.createTask);
-router.put('/tasks/:id', auth, taskController.updateTask);
-router.get('/tasks', auth, taskController.getAllTasks);  // La ruta está protegida por el middleware de autenticación
-router.delete('/tasks/:id', auth, taskController.deleteTask);
-
+router.post('/tasks', authMiddleware, taskController.createTask);
+router.put('/tasks/:id', authMiddleware, taskController.updateTask);
+router.get('/tasks', authMiddleware, taskController.getAllTasks);
+router.delete('/tasks/:id', authMiddleware, taskController.deleteTask);
 
 module.exports = router;
+
+
 

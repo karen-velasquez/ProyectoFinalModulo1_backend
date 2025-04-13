@@ -7,7 +7,6 @@ require('dotenv').config(); // Asegúrate de importar dotenv al inicio del archi
 const SECRET = process.env.JWT_SECRET;  // Ahora se usa desde el archivo .env
 
 
-// 📌 Registro
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -25,7 +24,7 @@ exports.register = async (req, res) => {
   }
 };
 
-// 📌 Login
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -46,7 +45,6 @@ exports.login = async (req, res) => {
   }
 };
 
-// 📌 Obtener datos del usuario autenticado
 exports.getProfile = async (req, res) => {
   try {
     const userId = req.user.id;

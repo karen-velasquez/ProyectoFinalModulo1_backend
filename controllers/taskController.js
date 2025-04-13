@@ -73,31 +73,31 @@ exports.updateTask = async (req, res) => {
 
 
 
-
-
 exports.getAllTasks = async (req, res) => {
   try {
-    const userId = req.user.id;  // Asegúrate de que req.user esté disponible por el middleware
+    const userId = req.user.id;
+    const { status, search, dueDate } = req.query;
 
-    // Obtener los filtros de la query
-    const { status, search } = req.query;
+    const filters = { createdBy: userId };
 
-    // Crear el objeto de filtros
-    const filters = {
-      createdBy: userId,  // Filtrar solo las tareas del usuario autenticado
-    };
+    if (status) filters.status = status;
 
-    // Si se especifica un filtro de estado (status), lo añadimos al objeto de filtros
-    if (status) {
-      filters.status = status;
-    }
-
-    // Si se especifica un filtro de búsqueda (search), lo añadimos al objeto de filtros
     if (search) {
-      filters.description = { [Op.iLike]: `%${search}%` };  // Buscamos en la descripción (case insensitive)
+      filters.title = { [Op.iLike]: `%${search}%` };
     }
 
-    // Buscar las tareas que coincidan con los filtros
+    if (dueDate) {
+      const date = new Date(dueDate); // esto toma la fecha local y la interpreta como UTC
+      const startOfDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0));
+      const endOfDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999));
+    
+      filters.dueDate = {
+        [Op.between]: [startOfDay, endOfDay],
+      };
+    }
+    
+    
+
     const tasks = await Task.findAll({
       where: filters,
       include: {
@@ -105,7 +105,7 @@ exports.getAllTasks = async (req, res) => {
         as: 'creator',
         attributes: ['id', 'name', 'email'],
       },
-      order: [['createdAt', 'DESC']],  // Opcional: ordena de más reciente a más antigua
+      order: [['createdAt', 'DESC']],
     });
 
     res.json(tasks);

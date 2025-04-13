@@ -2,7 +2,10 @@ const { User } = require('../models');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const SECRET = 'mi_clave_secreta_super_segura'; // idealmente usa dotenv
+require('dotenv').config(); // Asegúrate de importar dotenv al inicio del archivo
+
+const SECRET = process.env.JWT_SECRET;  // Ahora se usa desde el archivo .env
+
 
 // 📌 Registro
 exports.register = async (req, res) => {
@@ -33,7 +36,8 @@ exports.login = async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ error: 'Contraseña incorrecta' });
 
-    const token = jwt.sign({ id: user.id }, SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+
 
     res.json({ token });
   } catch (err) {
